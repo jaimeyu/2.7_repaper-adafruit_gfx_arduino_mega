@@ -98,7 +98,7 @@ public:
 #if defined(EPD_ENABLE_EXTRA_SRAM)
 
 #if EPD_IMAGE_ONE_ARG
-		this->EPD.image_sram(this->image);
+		this->EPD.image(this->new_image);
 #elif EPD_IMAGE_TWO_ARG
 		this->EPD.image_sram(this->old_image, this->new_image);
 #else

@@ -30,8 +30,8 @@
 #define EPD_CHIP_VERSION      1
 #define EPD_FILM_VERSION      110
 #define EPD_PWM_REQUIRED      1
-#define EPD_IMAGE_ONE_ARG     0
-#define EPD_IMAGE_TWO_ARG     1
+#define EPD_IMAGE_ONE_ARG     1
+#define EPD_IMAGE_TWO_ARG     0
 #define EPD_PARTIAL_AVAILABLE 0
 
 // display panels supported
@@ -116,11 +116,16 @@ public:
 
 	// clear display (anything -> white)
 	void clear(void) {
-		this->frame_fixed_repeat(0xff, EPD_compensate);
-		this->frame_fixed_repeat(0xff, EPD_white);
-		this->frame_fixed_repeat(0xaa, EPD_inverse);
+//		this->frame_fixed_repeat(0xff, EPD_compensate);
+//		Serial.println("Cleared 0xff EPD_compensate");
+//		this->frame_fixed_repeat(0xff, EPD_white);
+//		Serial.println("Cleared 0xff  EPD_white ");
+//		this->frame_fixed_repeat(0xaa, EPD_inverse);
+//		Serial.println("Cleared 0xaa EPD_inverse");
 		this->frame_fixed_repeat(0xaa, EPD_normal);
+		Serial.println("Cleared display EPD_normal");
 	}
+#if EPD_IMAGE_TWO_ARG
 
 	// assuming a clear (white) screen output an image (PROGMEM data)
 	void image_0(PROGMEM const uint8_t *image) {
@@ -137,6 +142,21 @@ public:
 		this->frame_data_repeat(new_image, EPD_inverse);
 		this->frame_data_repeat(new_image, EPD_normal);
 	}
+#else
+	// change from old image to new image (PROGMEM data)
+		void image(PROGMEM const uint8_t *image) {
+			clear();
+//			this->frame_fixed_repeat(0xaa, EPD_compensate);
+//			Serial.println("image 0xff EPD_compensate");
+//
+//			this->frame_fixed_repeat(0xaa, EPD_white);
+//			Serial.println("image 0xff  EPD_white ");
+//			this->frame_data_repeat(image, EPD_inverse);
+//			Serial.println("image 0xaa EPD_inverse");
+			this->frame_data_repeat(image, EPD_normal);
+			Serial.println("image display EPD_normal");
+		}
+#endif
 
 #if defined(EPD_ENABLE_EXTRA_SRAM)
 
@@ -162,7 +182,11 @@ public:
 
 	// stage_time frame refresh
 	void frame_fixed_repeat(uint8_t fixed_value, EPD_stage stage);
+#if EPD_IMAGE_TWO_ARG
 	void frame_data_repeat(PROGMEM const uint8_t *new_image, EPD_stage stage);
+#else
+	void frame_data_repeat(const uint8_t *new_image, EPD_stage stage);
+#endif
 #if defined(EPD_ENABLE_EXTRA_SRAM)
 	void frame_sram_repeat(const uint8_t *new_image, EPD_stage stage);
 #endif

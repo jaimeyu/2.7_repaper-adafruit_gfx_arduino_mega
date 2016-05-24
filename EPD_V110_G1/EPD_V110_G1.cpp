@@ -365,9 +365,9 @@ int EPD_Class::temperature_to_factor_10x(int temperature) const {
 
 
 // One frame of data is the number of lines * rows. For example:
-// The 1.44” frame of data is 96 lines * 128 dots.
-// The 2” frame of data is 96 lines * 200 dots.
-// The 2.7” frame of data is 176 lines * 264 dots.
+// The 1.44â€� frame of data is 96 lines * 128 dots.
+// The 2â€� frame of data is 96 lines * 200 dots.
+// The 2.7â€� frame of data is 176 lines * 264 dots.
 
 // the image is arranged by line which matches the display size
 // so smallest would have 96 * 32 bytes
@@ -418,8 +418,11 @@ void EPD_Class::frame_fixed_repeat(uint8_t fixed_value, EPD_stage stage) {
 	} while (stage_time > 0);
 }
 
-
+#if EPD_IMAGE_TWO_ARG
 void EPD_Class::frame_data_repeat(PROGMEM const uint8_t *image, EPD_stage stage) {
+#else
+	void EPD_Class::frame_data_repeat(const uint8_t *image, EPD_stage stage) {
+#endif
 	long stage_time = this->factored_stage_time;
 	do {
 		unsigned long t_start = millis();
@@ -567,10 +570,17 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 			uint8_t p4 = (pixels >> 0) & 0x03;
 			pixels = (p1 << 0) | (p2 << 2) | (p3 << 4) | (p4 << 6);
 			SPI_put_wait(pixels, this->EPD_Pin_BUSY);
+			Serial.print(p1, BIN);
+			Serial.print(p2, BIN);
+			Serial.print(p3, BIN);
+			Serial.print(p4, BIN);
 		} else {
 			SPI_put_wait(fixed_value, this->EPD_Pin_BUSY);
 		}
 	}
+
+
+	Serial.println("done");
 
 	if (this->filler) {
 		SPI_put_wait(0x00, this->EPD_Pin_BUSY);
